@@ -1,2 +1,2 @@
-web: gunicorn myproject.wsgi
+web: gunicorn Sanskrit_API.wsgi
 
