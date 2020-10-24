@@ -1,1 +1,2 @@
-web: gunicorn SansKrit_API.wsgi
+web: gunicorn myproject.wsgi
+
