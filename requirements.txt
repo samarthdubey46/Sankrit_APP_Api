@@ -5,5 +5,4 @@ djangorestframework==3.12.1
 psycopg2==2.8.6
 psycopg2-binary==2.8.6
 whitenoise==5.2.0
-WTForms==2.2.1
-xkit==0.0.0
+
