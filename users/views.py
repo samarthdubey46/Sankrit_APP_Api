@@ -32,10 +32,9 @@ class AllinOne(ModelViewSet):
 
 @api_view(['POST'])
 def login(request):
-    email = request.POST.get('email')
-    password = request.POST.get('password')
+    email = request.data.get('email')
+    password = request.data.get('password')
     user = User.objects.filter(email=email, password=password)
-    print(type(user))
     if len(user) <= 0:
         return Response({'status': False, 'res': f'No User With this {email}'})
 
