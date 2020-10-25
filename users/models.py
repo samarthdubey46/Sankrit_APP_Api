@@ -42,7 +42,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=30)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
-    last_updated = models.DateTimeField(verbose_name="last updated",auto_now=True)
+    last_updated = models.DateTimeField(verbose_name="last updated",auto_now_add=True)
     streak = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

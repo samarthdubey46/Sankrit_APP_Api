@@ -5,5 +5,4 @@ class AccountPropertiesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
-# 'pk', 'email', 'username', 'CurrentLevel', 'Profile_Pic','password'
+        fields = ['pk', 'email', 'username', 'CurrentLevel', 'Profile_Pic','password','streak','last_updated']
