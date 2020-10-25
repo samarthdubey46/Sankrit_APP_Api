@@ -37,10 +37,13 @@ def login(request):
     user = User.objects.filter(email=email, password=password)
     if len(user) <= 0:
         return Response({'status': False, 'res': f'No User With this {email}'})
-
     user = user[0]
+    userData = AccountPropertiesSerializer(instance=user)
     s = Token.objects.get(user=user)
-    return Response({'token': s.key, 'status': True})
+    obj = {'token': s.key, 'status': True}
+    for i,j in userData.data.items():
+        obj[i] = j
+    return Response(obj)
 
 
 class LeaderBoard(ListAPIView):
