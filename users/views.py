@@ -12,12 +12,22 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .serelizers import AccountPropertiesSerializer
 from .models import User
+import rest_framework.permissions as permissions
 from rest_framework.authtoken.models import Token
 
 
 class AllinOne(ModelViewSet):
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     serializer_class = AccountPropertiesSerializer
+
+    def get_permissions(self):
+        if self.action in ['create']:
+            self.permission_classes = [permissions.AllowAny, ]
+        else:
+            self.permission_classes = [permissions.IsAuthenticated, ]
+        return super(self.__class__, self).get_permissions()
 
 
 @api_view(['POST'])
@@ -32,5 +42,7 @@ def login(request):
 class LeaderBoard(ListAPIView):
     queryset = User.objects.all()
     serializer_class = AccountPropertiesSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     filter_backends = (OrderingFilter, SearchFilter)
     search_fields = ['username', 'CurrentLevel']
