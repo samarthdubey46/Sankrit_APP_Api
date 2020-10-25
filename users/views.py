@@ -34,9 +34,14 @@ class AllinOne(ModelViewSet):
 def login(request):
     email = request.POST.get('email')
     password = request.POST.get('password')
-    user = User.objects.filter(email=email, password=password)[0]
+    user = User.objects.filter(email=email, password=password)
+    print(type(user))
+    if len(user) <= 0:
+        return Response({'status': False, 'res': f'No User With this {email}'})
+
+    user = user[0]
     s = Token.objects.get(user=user)
-    return Response({'token': s.key})
+    return Response({'token': s.key, 'status': True})
 
 
 class LeaderBoard(ListAPIView):
