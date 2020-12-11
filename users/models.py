@@ -1,13 +1,14 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 
 class MyAccountManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, email, username, password=None, profile=None):
         if not email:
             raise ValueError('Users must have an email address')
         if not username:
@@ -16,18 +17,20 @@ class MyAccountManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
+            Profile_Pic=profile
         )
 
-        user.set_password(password)
+        # user.set_password(password)
+        user.password = make_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, username, password):
         user = self.create_user(
             email=self.normalize_email(email),
-            password=password,
             username=username,
         )
+        user.password = make_password(password)
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
@@ -42,17 +45,18 @@ class User(AbstractUser):
     username = models.CharField(max_length=30)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
-    last_updated = models.DateTimeField(verbose_name="last updated",auto_now_add=True)
+    last_updated = models.DateTimeField(verbose_name="last updated", auto_now_add=True)
     streak = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     CurrentLevel = models.IntegerField(default=1)
-    Profile_Pic = models.CharField(max_length=1000,blank=True)
+    Profile_Pic = models.CharField(max_length=1000, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     objects = MyAccountManager()
+
     def __str__(self):
         return self.email
 
@@ -63,7 +67,6 @@ class User(AbstractUser):
     # Does this user have permission to view this app? (ALWAYS YES FOR SIMPLICITY)
     def has_module_perms(self, app_label):
         return True
-
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
