@@ -10,6 +10,7 @@ urlpatterns = [
     path('leaderboard/',LeaderBoard.as_view()),
     path('login/', login, name='api_token_auth'),
     path('', include(router.urls)),
-    path('register/',register)
+    path('register/',register),
+
     # <-- And here
 ]

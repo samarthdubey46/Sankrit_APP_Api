@@ -67,7 +67,10 @@ def register(request):
     if len(user_test) >= 1:
         return Response({'status': False, 'message': 'user with this email already exists'})
     user = User.objects.create_user(email, username, password=password, profile=Profile_Pic)
-    return Response({'status': True, 'message': 'User Registered'})
+    return Response({'status': True, 'message': 'User Registered, now you can login'})
+
+
+
 
 
 class LeaderBoard(ListAPIView):
