@@ -12,6 +12,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('register/',register),
     path('top/', getTop),
+    path('get_stand/', getStanding),
 
     # <-- And here
 ]

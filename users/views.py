@@ -69,8 +69,6 @@ def register(request):
     return Response({'status': True, 'message': 'User Registered, now you can login'})
 
 
-
-
 class LeaderBoard(ListAPIView):
     queryset = User.objects.filter(is_superuser=False)
     serializer_class = AccountPropertiesSerializer
@@ -90,3 +88,24 @@ def getTop(request):
         Users_Final.append(AccountPropertiesSerializer(instance=i).data)
     Users_Final.sort(key=lambda x: x['CurrentLevel'], reverse=True)
     return Response(Users_Final[:10])
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def getStanding(request):
+    email = request.data.get('email')
+    password = request.data.get('password')
+    user = User.objects.filter(email=email, )
+    if len(user) <= 0:
+        return Response({'status': False, 'res': f'No User With this {email}'})
+    user = user[0]
+    if not user.check_password(password):
+        return Response({'status': False, 'res': f'The Password Is Invalid'})
+    userData = AccountPropertiesSerializer(instance=user).data
+    users = User.objects.filter(is_superuser=False)
+    Users_Final = []
+    for i in users:
+        Users_Final.append(AccountPropertiesSerializer(instance=i).data)
+    Users_Final.sort(key=lambda x: x['CurrentLevel'], reverse=True)
+    return Response({'status': True, 'res': Users_Final.index(userData) + 1})
