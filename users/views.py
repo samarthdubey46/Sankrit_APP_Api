@@ -3,7 +3,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -70,10 +69,6 @@ def register(request):
     return Response({'status': True, 'message': 'User Registered, now you can login'})
 
 
-class StandardResultsSetPagination(LimitOffsetPagination):
-    page_size = 5
-    page_size_query_param = 'page_size'
-    max_page_size = 5
 
 
 class LeaderBoard(ListAPIView):
@@ -83,7 +78,6 @@ class LeaderBoard(ListAPIView):
     authentication_classes = [TokenAuthentication]
     filter_backends = (OrderingFilter, SearchFilter)
     search_fields = ['username', 'CurrentLevel']
-    pagination_class = StandardResultsSetPagination
 
 
 @api_view(['GET'])
