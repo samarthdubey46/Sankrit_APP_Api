@@ -1,8 +1,9 @@
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -16,7 +17,6 @@ class AllinOne(ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     serializer_class = AccountPropertiesSerializer
-
 
 
 @api_view(['POST'])
@@ -39,21 +39,21 @@ def login(request):
 
 @api_view(['POST'])
 def register(request):
-    obj = {'errors':[]}
+    obj = {'errors': []}
     email = ''
     username = ''
     password = ''
     Profile_Pic = ''
     if 'email' not in request.data.keys():
-        obj['errors'].append({'email':'Enter Email'})
+        obj['errors'].append({'email': 'Enter Email'})
     else:
         email = request.data.get('email')
     if 'password' not in request.data.keys():
-        obj['errors'].append({'password':'Enter Password'})
+        obj['errors'].append({'password': 'Enter Password'})
     else:
         password = request.data.get('password')
     if 'username' not in request.data.keys():
-        obj['errors'].append({'username':'Enter Username'})
+        obj['errors'].append({'username': 'Enter Username'})
     else:
         username = request.data.get('username')
     if 'Profile_Pic' not in request.data.keys():
@@ -61,7 +61,7 @@ def register(request):
     else:
         Profile_Pic = request.data.get('Profile_Pic')
     if len(obj['errors']) > 0:
-        return Response({'status': False, 'errors':obj['errors'],'message':'Invalid Data'})
+        return Response({'status': False, 'errors': obj['errors'], 'message': 'Invalid Data'})
     user_test = User.objects.filter(email=email)
     print(user_test)
     if len(user_test) >= 1:
@@ -70,7 +70,10 @@ def register(request):
     return Response({'status': True, 'message': 'User Registered, now you can login'})
 
 
-
+class StandardResultsSetPagination(LimitOffsetPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 5
 
 
 class LeaderBoard(ListAPIView):
@@ -80,3 +83,16 @@ class LeaderBoard(ListAPIView):
     authentication_classes = [TokenAuthentication]
     filter_backends = (OrderingFilter, SearchFilter)
     search_fields = ['username', 'CurrentLevel']
+    pagination_class = StandardResultsSetPagination
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def getTop(request):
+    users = User.objects.filter(is_superuser=False)
+    Users_Final = []
+    for i in users:
+        Users_Final.append(AccountPropertiesSerializer(instance=i).data)
+    Users_Final.sort(key=lambda x: x['CurrentLevel'], reverse=True)
+    return Response(Users_Final[:10])
